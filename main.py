@@ -4,6 +4,7 @@
  # add SQL server for vulnerabilities
 
 import socket
+import os
 
 
 class TCPServer:
@@ -39,9 +40,6 @@ class TCPServer:
         return data
 
 
-
-
-
 class HTTPServer(TCPServer):
     def handle_request(self, data):
         # return b"Request received!"
@@ -49,27 +47,31 @@ class HTTPServer(TCPServer):
             b'HTTP/1.1 200 OK\r\n', # response line
             b'\r\n', # blank line
             b'Request received!' # response body
+    
         )
 
-        print("*" * 50)
-        print(data)
+        # print("*" * 50)
+        # print(data)
         data_list = data.split()
-        print(data_list[0])
+        # print(data_list[0])
         if data_list[0] == b"GET":
             return self.handle_get()
         elif data_list[0] == b"POST":
-            return self.handle_post()
+            return self.handle_post(data)
         else:
             return b"".join(response)
 
 
     def handle_get(self):
-        return b"You made a get request"
+        with open("index.html", "rb") as file:
+            page = file.read(4096)
+            page_plus_headers =  b'HTTP/1.1 200 OK\r\n\r\n' + page
+            return page_plus_headers
+        # return b"You made a get request"
     
-    def handle_post(self):
+    def handle_post(self, request):
+        print(request)
         return b"You made a post request"
-
-
 
 
 
