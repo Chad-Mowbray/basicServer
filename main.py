@@ -30,6 +30,9 @@ class TCPServer:
         """Handles incoming data and returns a response.
         Override this in subclass.
         """
+
+        # print("*" * 50)
+        # print(data)
         return data
 
 
@@ -44,7 +47,25 @@ class HTTPServer(TCPServer):
             b'\r\n', # blank line
             b'Request received!' # response body
         )
-        return b"".join(response)
+
+        print("*" * 50)
+        print(data)
+        data_list = data.split()
+        print(data_list[0])
+        if data_list[0] == b"GET":
+            return self.handle_get()
+        elif data_list[0] == b"POST":
+            return self.handle_post()
+        else:
+            return b"".join(response)
+
+
+    def handle_get(self):
+        return b"You made a get request"
+    
+    def handle_post(self):
+        return b"You made a post request"
+
 
 
 
