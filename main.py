@@ -5,6 +5,7 @@
 
 import socket
 import os
+from shutil import copyfile
 
 
 class TCPServer:
@@ -31,29 +32,23 @@ class TCPServer:
             conn.close()
 
     def handle_request(self, data):
-        """Handles incoming data and returns a response.
-        Override this in subclass.
-        """
-
         # print("*" * 50)
         # print(data)
         return data
 
 
 class HTTPServer(TCPServer):
+
+    default_header = b'HTTP/1.1 200 OK\r\n\r\n' 
+
     def handle_request(self, data):
-        # return b"Request received!"
         response = (
             b'HTTP/1.1 200 OK\r\n', # response line
             b'\r\n', # blank line
             b'Request received!' # response body
-    
         )
 
-        # print("*" * 50)
-        # print(data)
         data_list = data.split()
-        # print(data_list[0])
         if data_list[0] == b"GET":
             return self.handle_get()
         elif data_list[0] == b"POST":
@@ -65,13 +60,27 @@ class HTTPServer(TCPServer):
     def handle_get(self):
         with open("index.html", "rb") as file:
             page = file.read(4096)
-            page_plus_headers =  b'HTTP/1.1 200 OK\r\n\r\n' + page
+            page_plus_headers =  self.default_header + page
             return page_plus_headers
-        # return b"You made a get request"
     
     def handle_post(self, request):
-        print(request)
-        return b"You made a post request"
+    
+        user_input = request.decode('utf-8').split('\n')[-1][6:]
+
+        copyfile("post.html", "post_mod.html")
+
+        with open("post_mod.html", "a") as addition:
+            addition.write(f"<h2>{user_input}</h2>")
+            addition.write("</body>\n</html>")
+
+        with open("post_mod.html", "rb") as file:
+            page = file.read(4096)
+            page_plus_headers =  self.default_header + page
+            return page_plus_headers
+      
+        return b'Some kind of error'
+
+
 
 
 
