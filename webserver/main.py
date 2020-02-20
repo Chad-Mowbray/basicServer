@@ -49,31 +49,40 @@ class HTTPServer(TCPServer):
             b'\r\n', # blank line
         )
 
-        data_list = data.split()
         data_split = data.decode('utf-8').split('\n')
+
+        method = data_split[0].split()[0]
         uri = data_split[0].split()[1]
-        print("uri: ", uri)
+
+        print("uri: ", uri, method)
         if uri == '/fakesociety':
-            print("you are at posts")
-            # if data_list[0] == b"GET":
-            #     return self.handle_get()
-            # elif data_list[0] == b"POST":
-            #     return self.handle_post(data)
-            # else:
-            #     return b"".join(response)
+            if method == "GET":
+                return self.handle_fakesociety_get()
+            elif method == "POST":
+                return self.handle_fakesociety_post(data)
+            else:
+                return self.handle_error()
         elif uri == '/':
-            if data_list[0] == b"GET":
+            if method == "GET":
                 return self.handle_get()
-            elif data_list[0] == b"POST":
+            elif method == "POST":
                 return self.handle_post(data)
             else:
-                return b"".join(response)
+                return self.handle_error()
         else:
-            return b"".join(response)
+            return self.handle_error()
 
+
+
+    def handle_error(self):
+        pic_header = b'HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\n\r\n'
+        with open("error/error.html", "rb") as file:
+            page = file.read(4096)
+            page_plus_headers = pic_header + page
+            return page_plus_headers
 
     def handle_get(self):
-        with open("index.html", "rb") as file:
+        with open("main/index.html", "rb") as file:
             page = file.read(4096)
             page_plus_headers =  self.default_header + page
             return page_plus_headers
@@ -82,18 +91,47 @@ class HTTPServer(TCPServer):
     
         user_input = request.decode('utf-8').split('\n')[-1][6:]
 
-        copyfile("post.html", "post_mod.html")
+        copyfile("main/post.html", "main/post_mod.html")
 
-        with open("post_mod.html", "a") as addition:
+        with open("main/post_mod.html", "a") as addition:
             addition.write(f"<h2>{user_input}</h2>")
             addition.write("</body>\n</html>")
 
-        with open("post_mod.html", "rb") as file:
+        with open("main/post_mod.html", "rb") as file:
             page = file.read(4096)
             page_plus_headers =  self.default_header + page
             return page_plus_headers
       
-        return b'Some kind of error'
+        return self.handle_error()
+
+
+
+
+    def handle_fakesociety_get(self):
+        with open("fakesociety/get_fakesociety.html", "rb") as file:
+            page = file.read(4096)
+            page_plus_headers =  self.default_header + page
+            return page_plus_headers
+
+
+
+    def handle_fakesociety_post(self, request):
+        
+        user_input = request.decode('utf-8').split('\n')[-1][6:]
+
+        copyfile("fakesociety/post_fakesociety.html", "fakesociety/post_fakesociety_mod.html")
+
+        with open("fakesociety/post_fakesociety_mod.html", "a") as addition:
+            addition.write(f"<h2>{user_input}</h2>")
+            addition.write("</body>\n</html>")
+
+        with open("fakesociety/post_fakesociety_mod.html", "rb") as file:
+            page = file.read(4096)
+            page_plus_headers =  self.default_header + page
+            return page_plus_headers
+      
+        return self.handle_error()
+
 
 
 
