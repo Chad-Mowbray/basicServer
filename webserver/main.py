@@ -6,6 +6,7 @@
 import socket
 import os
 from shutil import copyfile
+import json
 
 
 class TCPServer:
@@ -23,13 +24,14 @@ class TCPServer:
 
         while True:
             conn, addr = s.accept()
-            print("Connected to by", addr)
-            data = conn.recv(1024)
-
+            ip_addr, port = addr
+            print(f"A computer on IP address {ip_addr} and Port {port} is connected to the server")
+            data = conn.recv(4096)
+            
             response = self.handle_request(data)
 
             conn.sendall(response)
-            conn.close()
+            # conn.close()
 
     def handle_request(self, data):
         # print("*" * 50)
@@ -45,14 +47,27 @@ class HTTPServer(TCPServer):
         response = (
             b'HTTP/1.1 200 OK\r\n', # response line
             b'\r\n', # blank line
-            b'Request received!' # response body
         )
 
         data_list = data.split()
-        if data_list[0] == b"GET":
-            return self.handle_get()
-        elif data_list[0] == b"POST":
-            return self.handle_post(data)
+        data_split = data.decode('utf-8').split('\n')
+        uri = data_split[0].split()[1]
+        print("uri: ", uri)
+        if uri == '/fakesociety':
+            print("you are at posts")
+            # if data_list[0] == b"GET":
+            #     return self.handle_get()
+            # elif data_list[0] == b"POST":
+            #     return self.handle_post(data)
+            # else:
+            #     return b"".join(response)
+        elif uri == '/':
+            if data_list[0] == b"GET":
+                return self.handle_get()
+            elif data_list[0] == b"POST":
+                return self.handle_post(data)
+            else:
+                return b"".join(response)
         else:
             return b"".join(response)
 
