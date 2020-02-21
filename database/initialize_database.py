@@ -31,12 +31,12 @@ class Initial_Database:
 
         for user in users:
             password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
-            id = 0 #val id
+            # id = 0 #val id
             username = '' # val 1
             email = '' # val 2
             for k,v in user.items():
-                if k == 'id':
-                    id = v
+                # if k == 'id':
+                #     id = v
                 if k == 'username':
                     username = v
                 if k == 'email':
@@ -100,85 +100,85 @@ if __name__ == "__main__":
 
 
 
-import requests
-import random
-import string
-import sqlite3
+# import requests
+# import random
+# import string
+# import sqlite3
 
 
-class Initial_Database:
+# class Initial_Database:
 
-    def __init__(self, db_name):
-        self.db_name = db_name
-        self.db = sqlite3.connect(db_name)
-        self.cursor = self.db.cursor()
+#     def __init__(self, db_name):
+#         self.db_name = db_name
+#         self.db = sqlite3.connect(db_name)
+#         self.cursor = self.db.cursor()
     
     
-    def create_if_not_there(self):
-        self.cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
+#     def create_if_not_there(self):
+#         self.cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
 
-        if self.cursor.fetchone()[0] == 1:
-            print(f'{self.db_name} already exists...')
-        else:
-            print(f'{self.db_name} does not exist yet, creating it now...')
-            self.cursor.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
-            self.db.commit()
-            self.cursor.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT, FOREIGN KEY (user_id) REFERENCES users (id))")
-            self.db.commit()
+#         if self.cursor.fetchone()[0] == 1:
+#             print(f'{self.db_name} already exists...')
+#         else:
+#             print(f'{self.db_name} does not exist yet, creating it now...')
+#             self.cursor.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
+#             self.db.commit()
+#             self.cursor.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT, FOREIGN KEY (user_id) REFERENCES users (id))")
+#             self.db.commit()
 
 
-    def populate_table(self, chunk):
-        print(len(chunk), type(chunk))
-        for chn in chunk:
-            print(chn)
+#     def populate_table(self, chunk):
+#         print(len(chunk), type(chunk))
+#         for chn in chunk:
+#             print(chn)
 
-        url, val_id, val_1, val_2, table_name = chunk[0], chunk[1], chunk[2], chunk[3], chunk[4]
+#         url, val_id, val_1, val_2, table_name = chunk[0], chunk[1], chunk[2], chunk[3], chunk[4]
 
-        req = requests.get(url) 
-        users = req.json()
-        three = ''
+#         req = requests.get(url) 
+#         users = req.json()
+#         three = ''
 
-        for user in users:
+#         for user in users:
             
-            for k,v in user.items():
-                if k == val_1:
-                    one = v
-                if k == val_2:
-                    two = v
-                if table_name == 'users':
-                    password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
-                    three == password
-                else:
-                    if k == val_id:
-                        three = v
+#             for k,v in user.items():
+#                 if k == val_1:
+#                     one = v
+#                 if k == val_2:
+#                     two = v
+#                 if table_name == 'users':
+#                     password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
+#                     three == password
+#                 else:
+#                     if k == val_id:
+#                         three = v
 
 
-            cursor = self.db.cursor()
-            if table_name == "users":
-                cursor.execute(f"INSERT INTO {table_name}(username, email, password)\nVALUES(?,?,?)", (one, two, three))
-            else:
-                cursor.execute(f"INSERT INTO {table_name}(user_id, title, body)\nVALUES(?,?,?)", (one, two, three))
+#             cursor = self.db.cursor()
+#             if table_name == "users":
+#                 cursor.execute(f"INSERT INTO {table_name}(username, email, password)\nVALUES(?,?,?)", (one, two, three))
+#             else:
+#                 cursor.execute(f"INSERT INTO {table_name}(user_id, title, body)\nVALUES(?,?,?)", (one, two, three))
 
 
-            print('added a new user')
-        self.db.commit()
+#             print('added a new user')
+#         self.db.commit()
 
 
-    def close_db(self):
-        self.db.close()
-        print("*********database is populated************")
+#     def close_db(self):
+#         self.db.close()
+#         print("*********database is populated************")
 
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    users_table = ("https://jsonplaceholder.typicode.com/users", 'id', 'username', 'email', 'users')
-    posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', "posts")
+#     users_table = ("https://jsonplaceholder.typicode.com/users", 'id', 'username', 'email', 'users')
+#     posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', "posts")
     
-    new_db = Initial_Database("users_and_posts.db")
-    new_db.create_if_not_there()
-    new_db.populate_table(users_table)
-    new_db.populate_table(posts_table)
-    new_db.close_db()
+#     new_db = Initial_Database("users_and_posts.db")
+#     new_db.create_if_not_there()
+#     new_db.populate_table(users_table)
+#     new_db.populate_table(posts_table)
+#     new_db.close_db()
 
