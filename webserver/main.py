@@ -67,7 +67,7 @@ class Server:
 
     def handle_error(self):
         basic_header = b'HTTP/1.1 200 OK\r\n'
-        pic_header = b'Content-Type: image/jpeg\r\n'
+        # pic_header = b'Content-Type: image/jpeg\r\n'
         with open("error/error.html", "rb") as file:
             page = file.read(4096)
             page_plus_headers = basic_header + page
