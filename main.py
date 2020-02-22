@@ -113,7 +113,7 @@ class Server:
 
         x = database.Information()
         # res = x.add_post(user_input_obj)
-        x.add_post(user_input_obj)
+        x.create_user_add_post(user_input_obj)
 
         base_folder = "webserver/fakesociety/"
         base_file = "get_fakesociety.html"

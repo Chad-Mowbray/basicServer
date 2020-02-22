@@ -10,243 +10,109 @@ class Initial_Database:
     def __init__(self, db_name):
         self.db_name = db_name
         self.db = sqlite3.connect(db_name)
-        self.cursor = self.db.cursor()
-    
+        self.cur = self.db.cursor()
     
     def create_if_not_there(self):
-        self.cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
+        self.cur.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
 
-        if self.cursor.fetchone()[0] == 1:
+        if self.cur.fetchone()[0] == 1:
             print(f'{self.db_name} already exists...')
             return False
         else:
             print(f'{self.db_name} does not exist yet, creating it now...')
-            self.cursor.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
+            self.cur.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
             self.db.commit()
-            self.cursor.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT, FOREIGN KEY (user_id) REFERENCES users (id))")
+            self.cur.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, userId INTEGER, title TEXT, body TEXT, FOREIGN KEY (userId) REFERENCES users (id))")
             self.db.commit()
             return True
 
-    def populate_users_table(self):
-        req = requests.get("https://jsonplaceholder.typicode.com/users") #url
+    def populate_table(self, url, val_1, val_2, val_3, table_name):
+        req = requests.get(url)
+        data = req.json()
 
-        users = req.json()
+        for datum in data:
+ 
+            db_insert_1 = '' # val 1  userId username
+            db_insert_2 = '' # val 2     body  email
+            db_insert_3 = '' # val 3  title password
 
-        for user in users:
-            password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
-            username = '' # val 1
-            email = '' # val 2
-            for k,v in user.items():
-                if k == 'username':
-                    username = v
-                if k == 'email':
-                    email = v
-            
-            cursor = self.db.cursor()
-            cursor.execute("INSERT INTO users(username, email, password)\nVALUES(?,?,?)", (username, email, password))
+            for k,v in datum.items():
+                if k == val_1:
+                    db_insert_1 = v
+                    print('this is the userId')
+                    print(db_insert_1)
+                if k == val_2 and table_name == "users":
+                    db_insert_2 = v
+                    db_insert_3 += ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
+                if k == val_2 and table_name == "posts":
+                    print('this is the title')
+                    db_insert_2 = v
+                    print(db_insert_2)
+                if k == val_3 and table_name == "posts":
+                    db_insert_3 = v
+                    print('this is the body')
+                    print(db_insert_3)
+              
+            self.cur.execute(f"INSERT INTO {table_name}('{val_1}', '{val_2}', '{val_3}')\nVALUES(?,?,?)", (db_insert_1, db_insert_2, db_insert_3))
 
-            print('added a new user')
+            print('added a new entry')
         self.db.commit()
 
-
-    def populate_posts_table(self):
-
-        req2 = requests.get("https://jsonplaceholder.typicode.com/posts")
-        posts = req2.json()
-
-        for post in posts:
-            user_id = 0
-            title = ''
-            body = ''
-            for k,v in post.items():
-                if k == "userId":
-                    user_id = v
-                if k == "title":
-                    title = v
-                if k == "body":
-                    body = v
-            
-            cursor = self.db.cursor()
-            cursor.execute("INSERT INTO posts(user_id, title, body)\nVALUES(?,?,?)", (user_id, title, body))
-
-            print('added a new post')
-        self.db.commit()
 
     def close_db(self):
         self.db.close()
         print("*********database is populated************")
 
 
-
 class Information:
 
-    # def __init__(self, db_name="users_posts.db"):
-    #     self.db_name = db_name
-    #     self.db = sqlite3.connect(db_name)
-    #     self.cursor = self.db.cursor()
+    def __init__(self, db_name="database/users_posts.db"):
+        self.db_name = db_name
+        self.db = sqlite3.connect(db_name)
+        self.cur = self.db.cursor()
 
     def request_posts(self, query):
-        
-        conn = sqlite3.connect("database/users_posts.db")
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM posts")
- 
-        rows = cur.fetchall()
+        self.cur.execute("SELECT title, body, username FROM posts JOIN users WHERE userId = users.id;")
+        rows = self.cur.fetchall()
  
         all_posts = ''
         for row in rows:
-            all_posts += f"<h2>Title: {row[2]}</h2> <p>Post: {row[3]} </p><br/>"
+            all_posts += f"<br><h2>Title: {row[0]}</h2> <p>Post: {row[1]} </p><small>by: {row[2]}</small><br><hr><br>"
 
         return all_posts
 
-
-
     def add_user(self, username, password, email="default@default.com"):
-        conn = sqlite3.connect("database/users_posts.db")
-        cursor = conn.cursor()
         # cur.execute(f"INSERT INTO users VALUES('{username}', '{email}', '{password}')")
-        cursor.execute("INSERT INTO users(username, email, password)\nVALUES(?,?,?)", (username, email, password))
-        conn.commit()
-        cursor.close()
+        self.cur.execute("INSERT INTO users(username, email, password)\nVALUES(?,?,?)", (username, email, password))
+        self.db.commit()
   
-
-
-    def add_post_and_title(self, user_id, title, body):
-        conn = sqlite3.connect("database/users_posts.db")
-        cursor = conn.cursor()
+    def just_add_post(self, user_id, title, body):
         # cur.execute(f"INSERT INTO users VALUES('{username}', '{email}', '{password}')")
-        cursor.execute("INSERT INTO posts(user_id, title, body)\nVALUES(?,?,?)", (user_id, title, body))
-        conn.commit()
-        cursor.close()
+        self.cur.execute("INSERT INTO posts(userId, title, body)\nVALUES(?,?,?)", (user_id, title, body))
+        self.db.commit()
+ 
 
+    def create_user_add_post(self, user_input_obj):
+        self.cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
+        user_id = self.cur.fetchone()
 
-    def add_post(self, user_input_obj):
-        conn = sqlite3.connect("database/users_posts.db")
-        cur = conn.cursor()
-        cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
-
-        user_id = cur.fetchone()
         if not user_id:
-            conn.close()
             self.add_user(user_input_obj["username"], user_input_obj["password"])
-            time.sleep(1)
-            conn = sqlite3.connect("database/users_posts.db")
-            cur = conn.cursor()
-            cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
-            user_id = cur.fetchone()
-            self.add_post_and_title(user_id[0], user_input_obj["title"], user_input_obj["post"])
-
+            self.cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
+            user_id = self.cur.fetchone()
+            self.just_add_post(user_id[0], user_input_obj["title"], user_input_obj["post"])
         else:
-            self.add_post_and_title(user_id[0], user_input_obj["title"], user_input_obj["post"])
-
-
-
-
-
-
+            self.just_add_post(user_id[0], user_input_obj["title"], user_input_obj["post"])
 
 
 if __name__ == "__main__":
 
-    # users_table = ("https://jsonplaceholder.typicode.com/users", 'id', 'username', 'email' )
-    # posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body')
+    users_table = ("https://jsonplaceholder.typicode.com/users", 'username', 'email', 'password', 'users')
+    posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', 'posts')
     
     new_db = Initial_Database("users_posts.db")
     should_continue = new_db.create_if_not_there()
     if should_continue:
-        new_db.populate_users_table()
-        new_db.populate_posts_table()
+        new_db.populate_table(users_table[0], users_table[1], users_table[2], users_table[3], users_table[4])
+        new_db.populate_table(posts_table[0], posts_table[1], posts_table[2], posts_table[3], posts_table[4])
     new_db.close_db()
-
-
-
-
-
-
-
-
-
-
-
-# import requests
-# import random
-# import string
-# import sqlite3
-
-
-# class Initial_Database:
-
-#     def __init__(self, db_name):
-#         self.db_name = db_name
-#         self.db = sqlite3.connect(db_name)
-#         self.cursor = self.db.cursor()
-    
-    
-#     def create_if_not_there(self):
-#         self.cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
-
-#         if self.cursor.fetchone()[0] == 1:
-#             print(f'{self.db_name} already exists...')
-#         else:
-#             print(f'{self.db_name} does not exist yet, creating it now...')
-#             self.cursor.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
-#             self.db.commit()
-#             self.cursor.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT, FOREIGN KEY (user_id) REFERENCES users (id))")
-#             self.db.commit()
-
-
-#     def populate_table(self, chunk):
-#         print(len(chunk), type(chunk))
-#         for chn in chunk:
-#             print(chn)
-
-#         url, val_id, val_1, val_2, table_name = chunk[0], chunk[1], chunk[2], chunk[3], chunk[4]
-
-#         req = requests.get(url) 
-#         users = req.json()
-#         three = ''
-
-#         for user in users:
-            
-#             for k,v in user.items():
-#                 if k == val_1:
-#                     one = v
-#                 if k == val_2:
-#                     two = v
-#                 if table_name == 'users':
-#                     password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
-#                     three == password
-#                 else:
-#                     if k == val_id:
-#                         three = v
-
-
-#             cursor = self.db.cursor()
-#             if table_name == "users":
-#                 cursor.execute(f"INSERT INTO {table_name}(username, email, password)\nVALUES(?,?,?)", (one, two, three))
-#             else:
-#                 cursor.execute(f"INSERT INTO {table_name}(user_id, title, body)\nVALUES(?,?,?)", (one, two, three))
-
-
-#             print('added a new user')
-#         self.db.commit()
-
-
-#     def close_db(self):
-#         self.db.close()
-#         print("*********database is populated************")
-
-
-
-
-# if __name__ == "__main__":
-
-#     users_table = ("https://jsonplaceholder.typicode.com/users", 'id', 'username', 'email', 'users')
-#     posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', "posts")
-    
-#     new_db = Initial_Database("users_and_posts.db")
-#     new_db.create_if_not_there()
-#     new_db.populate_table(users_table)
-#     new_db.populate_table(posts_table)
-#     new_db.close_db()
-
