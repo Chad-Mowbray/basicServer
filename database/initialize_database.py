@@ -17,12 +17,14 @@ class Initial_Database:
 
         if self.cursor.fetchone()[0] == 1:
             print(f'{self.db_name} already exists...')
+            return False
         else:
             print(f'{self.db_name} does not exist yet, creating it now...')
             self.cursor.execute("CREATE TABLE users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT, password TEXT)")
             self.db.commit()
             self.cursor.execute("CREATE TABLE posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT, FOREIGN KEY (user_id) REFERENCES users (id))")
             self.db.commit()
+            return True
 
     def populate_users_table(self):
         req = requests.get("https://jsonplaceholder.typicode.com/users") #url
@@ -31,12 +33,9 @@ class Initial_Database:
 
         for user in users:
             password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
-            # id = 0 #val id
             username = '' # val 1
             email = '' # val 2
             for k,v in user.items():
-                # if k == 'id':
-                #     id = v
                 if k == 'username':
                     username = v
                 if k == 'email':
@@ -78,6 +77,31 @@ class Initial_Database:
 
 
 
+class Information:
+
+    # def __init__(self, db_name="users_posts.db"):
+    #     self.db_name = db_name
+    #     self.db = sqlite3.connect(db_name)
+    #     self.cursor = self.db.cursor()
+
+
+    def request_posts(self, query):
+        
+
+
+
+        conn = sqlite3.connect("users_posts.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users")
+ 
+        rows = cur.fetchall()
+ 
+        for row in rows:
+            print(row)
+
+
+
+
 
 if __name__ == "__main__":
 
@@ -85,9 +109,10 @@ if __name__ == "__main__":
     # posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body')
     
     new_db = Initial_Database("users_posts.db")
-    new_db.create_if_not_there()
-    new_db.populate_users_table()
-    new_db.populate_posts_table()
+    should_continue = new_db.create_if_not_there()
+    if should_continue:
+        new_db.populate_users_table()
+        new_db.populate_posts_table()
     new_db.close_db()
 
 

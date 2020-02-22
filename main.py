@@ -7,6 +7,7 @@ import socket
 import os
 from shutil import copyfile
 import json
+from database import initialize_database as data
 
 
 class Server:
@@ -43,20 +44,20 @@ class Server:
 
         if uri == '/fakesociety':
             if method == "GET":
-                file_name = "fakesociety/get_fakesociety.html"
+                file_name = "webserver/fakesociety/get_fakesociety.html"
                 return self.handle_get(file_name)
             elif method == "POST":
-                base_folder = "fakesociety/"
+                base_folder = "webserver/fakesociety/"
                 base_file = "post_fakesociety.html"
                 return self.handle_post(data, base_folder, base_file)
             else:
                 return self.handle_error()
         elif uri == '/':
             if method == "GET":
-                file_name = "main/index.html"
+                file_name = "webserver/main/index.html"
                 return self.handle_get(file_name)
             elif method == "POST":
-                base_folder = "main/"
+                base_folder = "webserver/main/"
                 base_file = "post.html"
                 return self.handle_post(data, base_folder, base_file)
             else:
@@ -68,13 +69,20 @@ class Server:
     def handle_error(self):
         basic_header = b'HTTP/1.1 200 OK\r\n'
         # pic_header = b'Content-Type: image/jpeg\r\n'
-        with open("error/error.html", "rb") as file:
+        with open("webserver/error/error.html", "rb") as file:
             page = file.read(4096)
             page_plus_headers = basic_header + page
             return page_plus_headers
 
 
     def handle_get(self, file_name):
+
+        if "fake" in file_name:
+            print("@$@$@#$#@$@#$@#$@#@$2")
+            x = data.Information()
+            res = x.request_posts("posts")
+            print(res)
+
         with open(file_name, "rb") as file:
             page = file.read(4096)
             page_plus_headers =  self.default_header + page
