@@ -2,6 +2,7 @@ import requests
 import random
 import string
 import sqlite3
+import time
 
 
 class Initial_Database:
@@ -84,7 +85,6 @@ class Information:
     #     self.db = sqlite3.connect(db_name)
     #     self.cursor = self.db.cursor()
 
-
     def request_posts(self, query):
         
         conn = sqlite3.connect("database/users_posts.db")
@@ -95,11 +95,51 @@ class Information:
  
         all_posts = ''
         for row in rows:
-            # print("Title: " + row[2] + "\nPost: " + row[3])
             all_posts += f"<h2>Title: {row[2]}</h2> <p>Post: {row[3]} </p><br/>"
 
-        print(all_posts)
         return all_posts
+
+
+
+    def add_user(self, username, password, email="default@default.com"):
+        conn = sqlite3.connect("database/users_posts.db")
+        cursor = conn.cursor()
+        # cur.execute(f"INSERT INTO users VALUES('{username}', '{email}', '{password}')")
+        cursor.execute("INSERT INTO users(username, email, password)\nVALUES(?,?,?)", (username, email, password))
+        conn.commit()
+        cursor.close()
+  
+
+
+    def add_post_and_title(self, user_id, title, body):
+        conn = sqlite3.connect("database/users_posts.db")
+        cursor = conn.cursor()
+        # cur.execute(f"INSERT INTO users VALUES('{username}', '{email}', '{password}')")
+        cursor.execute("INSERT INTO posts(user_id, title, body)\nVALUES(?,?,?)", (user_id, title, body))
+        conn.commit()
+        cursor.close()
+
+
+    def add_post(self, user_input_obj):
+        conn = sqlite3.connect("database/users_posts.db")
+        cur = conn.cursor()
+        cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
+
+        user_id = cur.fetchone()
+        if not user_id:
+            conn.close()
+            self.add_user(user_input_obj["username"], user_input_obj["password"])
+            time.sleep(1)
+            conn = sqlite3.connect("database/users_posts.db")
+            cur = conn.cursor()
+            cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
+            user_id = cur.fetchone()
+            self.add_post_and_title(user_id[0], user_input_obj["title"], user_input_obj["post"])
+
+        else:
+            self.add_post_and_title(user_id[0], user_input_obj["title"], user_input_obj["post"])
+
+
 
 
 
