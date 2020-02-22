@@ -87,17 +87,20 @@ class Information:
 
     def request_posts(self, query):
         
-
-
-
-        conn = sqlite3.connect("users_posts.db")
+        conn = sqlite3.connect("database/users_posts.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM users")
+        cur.execute("SELECT * FROM posts")
  
         rows = cur.fetchall()
  
+        all_posts = ''
         for row in rows:
-            print(row)
+            # print("Title: " + row[2] + "\nPost: " + row[3])
+            all_posts += f"<h2>Title: {row[2]}</h2> <p>Post: {row[3]} </p><br/>"
+
+        print(all_posts)
+        return all_posts
+
 
 
 

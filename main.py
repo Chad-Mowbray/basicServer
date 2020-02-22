@@ -7,7 +7,7 @@ import socket
 import os
 from shutil import copyfile
 import json
-from database import initialize_database as data
+from database import initialize_database as database
 
 
 class Server:
@@ -29,7 +29,7 @@ class Server:
             conn, addr = s.accept()
             ip_addr, port = addr
             print(f"A computer on IP address {ip_addr} and Port {port} is connected to the server")
-            data = conn.recv(4096)
+            data = conn.recv(8192)
             response = self.handle_request(data)
             conn.sendall(response)
             conn.close()
@@ -43,12 +43,13 @@ class Server:
         print("uri: ", uri, method)
 
         if uri == '/fakesociety':
+            base_folder = "webserver/fakesociety/"
+            base_file = "post_fakesociety.html"
             if method == "GET":
                 file_name = "webserver/fakesociety/get_fakesociety.html"
-                return self.handle_get(file_name)
+                # return self.handle_get(file_name)
+                return self.handle_get(file_name, data, base_folder, base_file)
             elif method == "POST":
-                base_folder = "webserver/fakesociety/"
-                base_file = "post_fakesociety.html"
                 return self.handle_post(data, base_folder, base_file)
             else:
                 return self.handle_error()
@@ -70,23 +71,32 @@ class Server:
         basic_header = b'HTTP/1.1 200 OK\r\n'
         # pic_header = b'Content-Type: image/jpeg\r\n'
         with open("webserver/error/error.html", "rb") as file:
-            page = file.read(4096)
+            page = file.read(8192)
             page_plus_headers = basic_header + page
             return page_plus_headers
 
 
-    def handle_get(self, file_name):
+    # def handle_get(self, file_name):
+    def handle_get(self, file_name, data, base_folder, base_file):
+
 
         if "fake" in file_name:
             print("@$@$@#$#@$@#$@#$@#@$2")
-            x = data.Information()
+            base_path = base_folder + base_file
+            mod_path = base_folder + "copy_" + base_file
+            copyfile(base_path, mod_path)
+            x = database.Information()
             res = x.request_posts("posts")
             print(res)
 
-        with open(file_name, "rb") as file:
-            page = file.read(4096)
-            page_plus_headers =  self.default_header + page
-            return page_plus_headers
+            with open(mod_path, "a") as addition:
+                addition.write(res)
+                addition.write("</body>\n</html>")
+
+            with open(mod_path, "rb") as file:
+                page = file.read(8192)
+                page_plus_headers =  self.default_header + page
+                return page_plus_headers
     
 
     def handle_post(self, request, base_folder, base_file):
@@ -100,7 +110,7 @@ class Server:
             addition.write("</body>\n</html>")
 
         with open(mod_path, "rb") as file:
-            page = file.read(4096)
+            page = file.read(8192)
             page_plus_headers =  self.default_header + page
             return page_plus_headers
       

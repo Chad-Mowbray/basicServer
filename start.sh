@@ -5,3 +5,4 @@ cd ..
 
 echo starting server...
 python3 main.py
+cd database
