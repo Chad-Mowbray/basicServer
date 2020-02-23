@@ -7,6 +7,8 @@ import socket
 import os
 from shutil import copyfile
 import json
+from urllib.parse import unquote_plus
+
 from database import initialize_database as database
 
 
@@ -90,7 +92,7 @@ class Server:
             # print(res)
 
             with open(mod_path, "a") as addition:
-                addition.write(res)
+                addition.write(unquote_plus(res))
                 addition.write("</body>\n</html>")
 
             with open(mod_path, "rb") as file:

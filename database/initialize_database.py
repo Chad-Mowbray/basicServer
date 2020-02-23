@@ -77,7 +77,7 @@ class Information:
  
         all_posts = ''
         for row in rows:
-            all_posts += f"<br><h2>Title: {row[0]}</h2> <p>Post: {row[1]} </p><small>by: {row[2]}</small><br><hr><br>"
+            all_posts += "<br><h2>Title: {}</h2> <p>Post: {} </p><small>by: {}</small><br><hr><br>".format(row[0], row[1], row[2])
 
         return all_posts
 
