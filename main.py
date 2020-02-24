@@ -83,7 +83,7 @@ class Server:
     def handle_get(self, file_name, base_folder, base_file):
 
         if "fake" in file_name:
-            print("@$@$@#$#@$@#$@#$@#@$2")
+            # print("@$@$@#$#@$@#$@#$@#@$2")
             base_path = base_folder + base_file
             mod_path = base_folder + "copy_" + base_file
             copyfile(base_path, mod_path)
@@ -107,12 +107,15 @@ class Server:
         processed_user_input.pop(0)
 
         user_input_obj = {
-            "username": processed_user_input[0][0],
-            "password": processed_user_input[1][0],
-            "title": processed_user_input[2][0],
-            "post": processed_user_input[3][0]
+            "username": unquote_plus(processed_user_input[0][0]),
+            "password": unquote_plus(processed_user_input[1][0]),
+            "title": unquote_plus(processed_user_input[2][0]),
+            "post": unquote_plus(processed_user_input[3][0])
         }
 
+        print("%" * 79)
+        print("user_input_obj:")
+        print(user_input_obj)
         x = database.Information()
         # res = x.add_post(user_input_obj)
         x.create_user_add_post(user_input_obj)
