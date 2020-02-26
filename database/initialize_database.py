@@ -30,10 +30,9 @@ class Initial_Database:
         data = req.json()
 
         for datum in data:
- 
-            db_insert_1 = '' # val 1  userId username
-            db_insert_2 = '' # val 2     body  email
-            db_insert_3 = '' # val 3  title password
+            db_insert_1 = '' 
+            db_insert_2 = '' 
+            db_insert_3 = '' 
 
             for k,v in datum.items():
                 if k == val_1:
@@ -47,15 +46,13 @@ class Initial_Database:
                     db_insert_3 = v
               
             self.cur.execute(f"INSERT INTO {table_name}('{val_1}', '{val_2}', '{val_3}')\nVALUES(?,?,?)", (db_insert_1, db_insert_2, db_insert_3))
-
             print('added a new entry')
-        # cur.execute("UPDATE users SET password = 1111 WHERE id = 1")
-        self.db.commit()
 
+        self.db.commit()
 
     def close_db(self):
         self.db.close()
-        print("*********database is populated************")
+        print("*********database is available************")
 
 
 class Information:
@@ -77,54 +74,33 @@ class Information:
 
     def add_user(self, username, password, email="default@default.com"):
         try:
-            # cur.execute(f"INSERT INTO users VALUES('{username}', '{email}', '{password}')")
-            # sqlite_insert_query = """INSERT INTO SqliteDb_developers
-                            #   (id, name, email, joining_date, salary) 
-                            #    VALUES 
-                            #   (1,'James','james@pynative.com','2019-03-17',8000)"""
             self.cur.execute("INSERT INTO users(username, email, password)\nVALUES('{}','{}','{}')".format(username, email, password))
-            # self.cur.execute("INSERT INTO users(username, email, password)\nVALUES(?,?,?)", (username, email, password))
             self.db.commit()
         except:
             print("error in add_user")
   
     def just_add_post(self, userId, title, body):
-        print("in just_add_post: userId, title, body")
-        print(userId)
-        print(title)
-        print(body)
-        # try: 
-             # self.cur.execute(f"INSERT INTO users VALUES('{userId}', '{title}', '{body}')")
-        self.cur.execute("INSERT INTO posts(userId, title, body)\nVALUES(?,?,?)", (userId, title, body))
-        # self.cur.execute("INSERT INTO posts(userId, title, body)\nVALUES('{}','{}','{}')".format(userId, title, body))
-
-        self.db.commit()
-        # except:
-            # print("error in just_add_post")
+        try: 
+            self.cur.execute("INSERT INTO posts(userId, title, body)\nVALUES(?,?,?)", (userId, title, body))
+            self.db.commit()
+        except:
+            print("error in just_add_post")
         
-
- 
     def create_user_add_post(self, user_input_obj):
         usr = "'" + user_input_obj['username'] + "'"
-        # usr = user_input_obj['username']
-        # try:
-        self.cur.execute(f"""SELECT id FROM users WHERE username = {usr} """)  
-        userId = self.cur.fetchone()   
-        print("userId:")             
-        print(userId)
+        try:
+            self.cur.executescript(f"""SELECT id FROM users WHERE username = {usr} """)  
+            userId = self.cur.fetchone()   
+            if not userId:
+                self.add_user(user_input_obj["username"], user_input_obj["password"])
+                self.cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
+                userId = self.cur.fetchone()
+                self.just_add_post(userId[0], user_input_obj["title"], user_input_obj["post"])
+            else:
+                self.just_add_post(userId[0], user_input_obj["title"], user_input_obj["post"])
+        except:
+            print("error in create_user_add_post")
 
-        if not userId:
-            print("in create_user_add_post else")
-
-            self.add_user(user_input_obj["username"], user_input_obj["password"])
-            self.cur.execute(f"SELECT id FROM users WHERE username = '{user_input_obj['username']}'")
-            userId = self.cur.fetchone()
-            self.just_add_post(userId[0], user_input_obj["title"], user_input_obj["post"])
-        else:
-            print("in create_user_add_post else")
-            self.just_add_post(userId[0], user_input_obj["title"], user_input_obj["post"])
-        # except:
-        #     print("error in create_user_add_post")
 
 if __name__ == "__main__":
 
