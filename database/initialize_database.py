@@ -47,7 +47,6 @@ class Initialize_Database:
               
             self.cur.execute(f"INSERT INTO {table_name}('{val_1}', '{val_2}', '{val_3}')\nVALUES(?,?,?)", (db_insert_1, db_insert_2, db_insert_3))
             print('added a new entry')
-
         self.db.commit()
 
     def close_db(self):
@@ -65,11 +64,9 @@ class Modify_Database(Initialize_Database):
     def request_posts(self, query):
         self.cur.execute("SELECT title, body, username FROM posts JOIN users WHERE userId = users.id;")
         rows = self.cur.fetchall()
- 
         all_posts = ''
         for row in rows:
             all_posts += "<br><h2>Title: {}</h2> <p>Post: {} </p><small>by: {}</small><br><hr><br>".format(row[0], row[1], row[2])
-
         return all_posts
 
     def add_user(self, username, password, email="default@default.com"):
@@ -114,5 +111,3 @@ if __name__ == "__main__":
         new_db.populate_table(posts_table[0], posts_table[1], posts_table[2], posts_table[3], posts_table[4])
     new_db.close_db()
 
-    # x = Information()
-    # res = x.request_posts("posts")
