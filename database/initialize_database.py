@@ -4,13 +4,13 @@ import string
 import sqlite3
 
 
-class Initial_Database:
+class Initialize_Database:
 
-    def __init__(self, db_name):
+    def __init__(self, db_name="database/users_posts.db"):
         self.db_name = db_name
         self.db = sqlite3.connect(db_name)
         self.cur = self.db.cursor()
-    
+
     def create_if_not_there(self):
         self.cur.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
 
@@ -55,10 +55,10 @@ class Initial_Database:
         print("*********database is available************")
 
 
-class Information:
+class Modify_Database(Initialize_Database):
 
     def __init__(self, db_name="database/users_posts.db"):
-        self.db_name = db_name
+        super().__init__(db_name)
         self.db = sqlite3.connect(db_name)
         self.cur = self.db.cursor()
 
@@ -107,10 +107,12 @@ if __name__ == "__main__":
     users_table = ("https://jsonplaceholder.typicode.com/users", 'username', 'email', 'password', 'users')
     posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', 'posts')
     
-    new_db = Initial_Database("users_posts.db")
+    new_db = Initialize_Database("users_posts.db")
     should_continue = new_db.create_if_not_there()
     if should_continue:
         new_db.populate_table(users_table[0], users_table[1], users_table[2], users_table[3], users_table[4])
         new_db.populate_table(posts_table[0], posts_table[1], posts_table[2], posts_table[3], posts_table[4])
     new_db.close_db()
 
+    # x = Information()
+    # res = x.request_posts("posts")

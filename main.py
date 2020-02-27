@@ -69,7 +69,7 @@ class Server:
                 base_path = base_folder + base_file
                 mod_path = base_folder + "copy_" + base_file
                 copyfile(base_path, mod_path)
-                x = database.Information()
+                x = database.Modify_Database()
                 res = x.request_posts("posts")
 
                 with open(mod_path, "a") as addition:
@@ -95,7 +95,7 @@ class Server:
                 "title": unquote_plus(processed_user_input[2][0]),
                 "post": unquote_plus(processed_user_input[3][0])
             }
-            x = database.Information()
+            x = database.Modify_Database()
             x.create_user_add_post(user_input_obj)
 
             base_folder = "webserver/fakesociety/"
