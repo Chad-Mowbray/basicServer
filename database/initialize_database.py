@@ -4,13 +4,13 @@ import string
 import sqlite3
 
 
-class Initial_Database:
+class Initialize_Database:
 
-    def __init__(self, db_name):
+    def __init__(self, db_name="database/users_posts.db"):
         self.db_name = db_name
         self.db = sqlite3.connect(db_name)
         self.cur = self.db.cursor()
-    
+
     def create_if_not_there(self):
         self.cur.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
 
@@ -47,7 +47,6 @@ class Initial_Database:
               
             self.cur.execute(f"INSERT INTO {table_name}('{val_1}', '{val_2}', '{val_3}')\nVALUES(?,?,?)", (db_insert_1, db_insert_2, db_insert_3))
             print('added a new entry')
-
         self.db.commit()
 
     def close_db(self):
@@ -55,21 +54,19 @@ class Initial_Database:
         print("*********database is available************")
 
 
-class Information:
+class Modify_Database(Initialize_Database):
 
     def __init__(self, db_name="database/users_posts.db"):
-        self.db_name = db_name
+        super().__init__(db_name)
         self.db = sqlite3.connect(db_name)
         self.cur = self.db.cursor()
 
     def request_posts(self, query):
         self.cur.execute("SELECT title, body, username FROM posts JOIN users WHERE userId = users.id;")
         rows = self.cur.fetchall()
- 
         all_posts = ''
         for row in rows:
             all_posts += "<br><h2>Title: {}</h2> <p>Post: {} </p><small>by: {}</small><br><hr><br>".format(row[0], row[1], row[2])
-
         return all_posts
 
     def add_user(self, username, password, email="default@default.com"):
@@ -107,7 +104,7 @@ if __name__ == "__main__":
     users_table = ("https://jsonplaceholder.typicode.com/users", 'username', 'email', 'password', 'users')
     posts_table = ("https://jsonplaceholder.typicode.com/posts", 'userId', 'title', 'body', 'posts')
     
-    new_db = Initial_Database("users_posts.db")
+    new_db = Initialize_Database("users_posts.db")
     should_continue = new_db.create_if_not_there()
     if should_continue:
         new_db.populate_table(users_table[0], users_table[1], users_table[2], users_table[3], users_table[4])
