@@ -43,6 +43,15 @@ In all likelihood your database doesn't just have googleable information like "h
 
 OK, then the solution is simple: no more user input!  Unfortunately, this pretty much ruins the internet.  In the end, this is just how it has to be, unless you are prepared to hard-code every query ahead of time, or maybe just let users ctrl+f the information they want.  You can skateboard, just wear a helmet.
 
+So how would you abuse the above SQL query?  Let's go to a deliberately vulnerable website to find out.
+
+[http://testphp.vulnweb.com/](http://testphp.vulnweb.com/) is a poorly designed website that offers some insights in what not to do.
+
+Let's go ahead and create an account: [sign up](http://testphp.vulnweb.com/signup.php)
+
+Oh look, all of our account information, including credit card number, is being sent over HTTP.  Even an unsophisticated attacker could get this information.  Even your browser can show you!
+
+[Form Data](signup.png)
 
 
 
@@ -124,4 +133,6 @@ In username:
 ## The Ethical Hacker
 After years of cybrcrime, you start having second thoughts about your place in the world.  Sure, you have lots of Ipods, and no school records, but in the end, aren't you really just a social parasite?  It's time to make amends.  Since you know how to break it, it shouldn't be that hard to fix it.  
 
-Change the source code so that your old attacks don't work anymore.
+Change the source code so that your old attacks don't work anymore.  Here are some resources that might help:
+
+[OWASP SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
