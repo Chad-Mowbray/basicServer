@@ -2,7 +2,7 @@
 
 OWASP is one of those unofficial official organizations that holds a lot of sway in the security world.  They publish a few guides that tend to be seen as authoritative.  One of those guides is the annual [OWASP Top Ten](https://owasp.org/www-project-top-ten/).  
 
-These are the most common and most serious security flaws and vulnerabilities on the web today.  Just for the sake of thoroughness--and because, just maybe, you are wary of clicking on just any old link you happen across--, here is OWASP's most recent top 10:
+These are the most common and most serious security flaws and vulnerabilities on the web today.  Just for the sake of thoroughness--and because, just maybe, you are wary of clicking on some random link you happened across--, here is OWASP's most recent top 10:
 
 1. Injection
 2. Broken Authentication
@@ -15,7 +15,7 @@ These are the most common and most serious security flaws and vulnerabilities on
 9. Using Components with Known Vulnerabilities
 10. Insufficient Logging and Monitoring
 
-We're going to spend today worrying about SQL Injection and Cross-Site Scripting.
+Feel free to peruse the list to get a feel for what you're up against (or working with). We're going to spend today worrying about SQL Injection and Cross-Site Scripting.
 
 ## SQL Injection
 Always Sanitize Your Inputs.  We are already familiar with basic SQL commands, such as this fine query that returns everything in the "users" table:
@@ -24,7 +24,26 @@ Always Sanitize Your Inputs.  We are already familiar with basic SQL commands, s
 SELECT * FROM users;
 ```
 
-Well, let's say you have a website where you sell Compact Discs on the Internet.  
+Well, let's say you have a website where you sell Compact Discs on the Internet.  Always Sanitize Your Inputs.  A potential customer does a search for "Nirvana".  See if you can construct a likely SQL query for that information.
+
+```sql
+SELECT * FROM albums WHERE artist = "Nirvana"
+```
+
+You make that database call, then display the results on your page.  
+
+Your backend code might then look something like this:
+
+```python
+search_results = sql.make_query(f"SELECT * FROM albums WHERE artist = {user_input}")
+```
+That sure does seem convenient.  And really, how else would you know what query to make, unless the user tells you.  The problem with this is that you are opening up a direct path from random people on the internet (some of whom type while wearing hoodies) to your precious, precious data.  
+
+In all likelihood your database doesn't just have googleable information like "how many albums did Nirvana put out?", but also usernames, passwords, credit cards...  
+
+OK, then the solution is simple: no more user input!  Unfortunately, this pretty much ruins the internet.  In the end, this is just how it has to be, unless you are prepared to hard-code every query ahead of time, or maybe just let users ctrl+f the information they want.  You can skateboard, just wear a helmet.
+
+
 
 
 
