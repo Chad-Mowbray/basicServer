@@ -53,6 +53,59 @@ Oh look, all of our account information, including credit card number, is being 
 
 [Form Data](signup.png)
 
+Let's kep browsing.  If we click around the artists, we can see that a query is formed in the URL bar:
+
+```bash
+http://testphp.vulnweb.com/artists.php?artist=1
+```
+If we suppose that the "1" is likely to be direct input to a databse query, we should be able to get more than just information about artist 1.
+
+```bash
+http://testphp.vulnweb.com/artists.php?artist='1
+```
+
+What do we learn from this error message?
+
+```bash
+Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given in /hj/var/www/artists.php on line 62
+```
+
+What kind of database is this?
+How many parameters does the function take?
+What are the parameter types?  # http://testphp.vulnweb.com/artists.php?artist=true is the same as artist=1
+Where is this file stored on the server?
+Is this writen in JavaScript?
+
+This is the kind of result you might get from deploying something in debug mode.  You want helpful error messages for yourself while you are devloping, but users should not be given such detailed information.
+
+(have you ever noticed that, when you enter your username and password, that some sites will give you more information than others...)
+
+So if we suppose that the database is MySQL, how do we use that information to find out what the database's table are?
+
+Do we have a better idea of how the database is constructed?
+
+Feel free to play around some more on your own.  But for now, we're going to turn away from the deleberately weak David to the Goliath of the internet: Google.
+
+But Google is a friendly Goliath.  Let's say hi:
+
+```javascript
+alert('hi')
+```
+
+You know, I've always thought that Google's homepage was a little too exciting.  Let's tone it down:
+
+```javascript
+document.write("what?")
+```
+
+```javascript
+document.write("<h1>GOOGLE</h1>")
+```
+
+
+
+
+
 
 
 
