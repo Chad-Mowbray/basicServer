@@ -1,6 +1,6 @@
 # Cross-site Scripting and SQL Injection
 
-OWASP is one of those unofficial official organizations that holds a lot of sway in the security world.  They publish a few guides that tend to be seen as authoritative.  One of those guides is the annual [OWASP Top Ten](https://owasp.org/www-project-top-ten/).  
+OWASP is one of those unofficial official organizations that holds a lot of sway in the security world.  They publish a few guides that tend to be seen as authoritative.  One of those guides is the every-few-yearly [OWASP Top Ten](https://owasp.org/www-project-top-ten/).  
 
 These are the most common and most serious security flaws and vulnerabilities on the web today.  Just for the sake of thoroughness--and because, just maybe, you are wary of clicking on some random link you happened across--, here is OWASP's most recent top 10:
 
@@ -18,34 +18,38 @@ These are the most common and most serious security flaws and vulnerabilities on
 Feel free to peruse the list to get a feel for what you're up against (or working with). We're going to spend today worrying about SQL Injection and Cross-Site Scripting.
 
 ## SQL Injection
-Always Sanitize Your Inputs.  We are already familiar with basic SQL commands, such as this fine query that returns everything in the "users" table:
+We are already familiar with basic SQL commands, such as this fine query that returns everything in the "users" table:
 
 ```SQL
 SELECT * FROM users;
 ```
+So how does this work in the context of a website?
 
-Well, let's say you have a website where you sell Compact Discs on the Internet.  Always Sanitize Your Inputs.  A potential customer does a search for "Nirvana".  See if you can construct a likely SQL query for that information.
+Well, let's say you have a website where you sell Compact Discs on the Internet.  A potential customer does a search for "Nirvana".  See if you can construct a likely SQL query for that information.
 
 ```sql
 SELECT * FROM albums WHERE artist = "Nirvana"
 ```
 
-You make that database call, then display the results on your page.  
+You make that database call, then display the results on your page.  Of course, you can't just hope that people only search for "Nirvana", so you are going to have to deal with user input somehow.
 
-Your backend code might then look something like this:
+If your backend uses Python, your database query might look something like this:
 
 ```python
 search_results = sql.make_query(f"SELECT * FROM albums WHERE artist = {user_input}")
 ```
-That sure does seem convenient.  And really, how else would you know what query to make, unless the user tells you.  The problem with this is that you are opening up a direct path from random people on the internet (some of whom type while wearing hoodies) to your precious, precious data.  
+
+Just take whatever a user types in and carry it over to your database.  That sure does seem convenient. You hardly have to change the basic SQL query. And really, how else would you know what query to make, unless the user tells you.  The problem with this is that you are opening up a direct path from random people on the internet (some of whom type while wearing hoodies) to your precious, precious data.  
 
 In all likelihood your database doesn't just have googleable information like "how many albums did Nirvana put out?", but also usernames, passwords, credit cards...  
 
-OK, then the solution is simple: no more user input!  Unfortunately, this pretty much ruins the internet.  In the end, this is just how it has to be, unless you are prepared to hard-code every query ahead of time, or maybe just let users ctrl+f the information they want.  You can skateboard, just wear a helmet.
+OK, then the solution is simple: no more user input! Lock everything up and turn off the lights.
+
+Unfortunately, this would pretty much ruin the internet.  In the end, you have to learn to deal with user input, unless you are prepared to hard-code every query ahead of time, or maybe just let users ctrl+f the information they want.  You can skateboard, just wear a helmet.
 
 So how would you abuse the above SQL query?  Let's go to a deliberately vulnerable website to find out.
 
-[http://testphp.vulnweb.com/](http://testphp.vulnweb.com/) is a poorly designed website that offers some insights in what not to do.
+[http://testphp.vulnweb.com/](http://testphp.vulnweb.com/) is a poorly designed website that offers some insights in what <i>not</i> to do.
 
 Let's go ahead and create an account: [sign up](http://testphp.vulnweb.com/signup.php)
 
@@ -64,19 +68,23 @@ If we suppose that the "1" is likely to be direct input to a databse query, we s
 http://testphp.vulnweb.com/artists.php?artist='1
 ```
 
+It might not seem that exciting, but it's a gold mine for a potential attacker.  
+
 What do we learn from this error message?
 
 ```bash
 Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given in /hj/var/www/artists.php on line 62
 ```
 
-What kind of database is this?
+What kind of database is this? 
+    # MySQL.  Will this help us?
 How many parameters does the function take?
-What are the parameter types?  # http://testphp.vulnweb.com/artists.php?artist=true is the same as artist=1
+What are the parameter types?  
+    # http://testphp.vulnweb.com/artists.php?artist=true is the same as artist=1
 Where is this file stored on the server?
 Is this writen in JavaScript?
 
-This is the kind of result you might get from deploying something in debug mode.  You want helpful error messages for yourself while you are devloping, but users should not be given such detailed information.
+This is the kind of result you might get from deploying something in debug mode (both Django and React have "debug" and "production" modes).  You want helpful error messages for yourself while you are devloping, but users should not be given such detailed information.
 
 (have you ever noticed that, when you enter your username and password, that some sites will give you more information than others...)
 
@@ -84,9 +92,11 @@ So if we suppose that the database is MySQL, how do we use that information to f
 
 Do we have a better idea of how the database is constructed?
 
-Feel free to play around some more on your own.  But for now, we're going to turn away from the deleberately weak David to the Goliath of the internet: Google.
+This is just a taste for now, but feel free to play around some more on your own.  
 
-But Google is a friendly Goliath.  Let's say hi:
+Now we're going to turn away from the deleberately weak David to the Goliath of the internet: Google.
+
+But Google is a friendly Goliath.  We can even coax it into saying "hi" to us:
 
 ```javascript
 alert('hi')
@@ -102,11 +112,40 @@ document.write("what?")
 document.write("<h1>GOOGLE</h1>")
 ```
 
+<!-- ```javascript
+document.write("<img src='https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.petfinder.com%2Fcat-breeds%2Fcollections%2Ffluffy-cat%2F&psig=AOvVaw3amvzcQutTUQGfZfUqZOac&ust=1583031559539000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOjE26Li9ecCFQAAAAAdAAAAABAD'>")
+``` -->
+Some defences!  Maybe this won't be quite as easy as we thought.
 
 
+OK, enough fun and games with HTML.  Let's get down to malicious Javascript business.
+
+We are going to inject Javascript into this webpage using nothing but... Javascript.
+
+First we'll go into the console of the developer tools and create the script tag that will hold our dangerous content:
+
+```javascript
+let script = document.createElement('script');
+```
+
+Now we really get to use our imaginations.  You can put whatever Javascript you want in here.  What can you get away with?  We'll do something nice and boring...for now.
+
+```javascript
+script.innerText = "console.log('asdfasdfasfd')"
+```
+
+OK, so now we have a complete script tag ready to go.  But unfortunately, it's just hanging out in the developer console.  How can we get it onto the webpage where it can wreak havoc?
+
+```javascript
+document.head.append(script);
+```
+
+Nothing looks different, but it is.  Go into the "Elements" tab of the developer tools and look inside the <head> tag.  What do you see?
 
 
+## Cross-Site Scripting
 
+What we've just been doing is part of cross-site scripting.  
 
 
 
