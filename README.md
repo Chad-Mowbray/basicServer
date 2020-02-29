@@ -75,14 +75,22 @@ What do we learn from this error message?
 ```bash
 Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given in /hj/var/www/artists.php on line 62
 ```
-
+---
 What kind of database is this? 
-    # MySQL.  Will this help us?
+(MySQL.  Will this help us?)
+
 How many parameters does the function take?
+(at least one)
+
 What are the parameter types?  
-    # http://testphp.vulnweb.com/artists.php?artist=true is the same as artist=1
+(the first one is a boolean -- http://testphp.vulnweb.com/artists.php?artist=true is the same as artist=1)
+
 Where is this file stored on the server?
+(/hj/var/www/artists.php)
+
 Is this writen in JavaScript?
+(probably not, PHP (snake-case))
+---
 
 This is the kind of result you might get from deploying something in debug mode (both Django and React have "debug" and "production" modes).  You want helpful error messages for yourself while you are devloping, but users should not be given such detailed information.
 
